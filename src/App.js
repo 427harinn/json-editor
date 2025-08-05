@@ -41,6 +41,18 @@ function App() {
     newData.items.splice(index, 0, newStep); // indexに挿入
     setJsonData(newData);
   };
+  // ステップを削除する関数
+  const deleteStepAt = (index) => {
+    if (jsonData.items.length <= 1) {
+      alert("ステップは1つ以上必要です！");
+      return;
+    }
+
+    const newData = { ...jsonData };
+    newData.items.splice(index, 1); // 指定したindexを削除
+    setJsonData(newData);
+  };
+
 
 
 
@@ -58,13 +70,24 @@ function App() {
             <div key={itemIndex} style={{ marginBottom: "30px", padding: "10px", border: "1px solid #ccc" }}>
               
               {/* ステップ前に挿入するボタン */}
+
               <button
                 onClick={() => insertStepAt(itemIndex)}
                 style={{ marginBottom: "10px", backgroundColor: "#d3f8d3" }}
               >
                 ＋ このステップの前にステップを追加
               </button>
-
+              <button
+                onClick={() => deleteStepAt(itemIndex)}
+                style={{
+                  marginTop: "10px",
+                  backgroundColor: "#fdd",
+                  color: "#900",
+                  border: "1px solid #900"
+                }}
+              >
+                − このステップを削除
+            </button>
               <h3>ステップ {itemIndex + 1}</h3>
 
               {item.commands.map((command, commandIndex) => (
@@ -78,7 +101,9 @@ function App() {
                   }}
                 />
               ))}
+
             </div>
+            
             
           ))}
           <button
