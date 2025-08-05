@@ -21,6 +21,28 @@ function App() {
     };
     reader.readAsText(file);
   };
+  // 編集済みJSONをダウンロードする関数
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'edited.json';
+      link.click();
+  };
+  // ステップを挿入する関数
+  const insertStepAt = (index) => {
+    const newData = { ...jsonData };
+    const newStep = {
+      commands: [] // 空のコマンド配列
+    };
+    newData.items.splice(index, 0, newStep); // indexに挿入
+    setJsonData(newData);
+  };
+
+
 
   return (
     <div style={{ padding: "20px" }}>
