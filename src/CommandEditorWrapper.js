@@ -1,20 +1,26 @@
 // CommandEditorWrapper.js
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import CommandEditor from './CommandEditor';
 
 export default function CommandEditorWrapper({ command, onChange, onDelete, defaultCollapsed = true, forceExpand }) {
+  // 初期状態を defaultCollapsed から設定
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+
+  // defaultCollapsed が変更されたときに collapsed を更新
   useEffect(() => {
-  if (forceExpand === true) {
-    setCollapsed(false);
-  } else if (forceExpand === false) {
-    setCollapsed(true);
-  }
-}, [forceExpand]);
+    setCollapsed(defaultCollapsed);
+  }, [defaultCollapsed]);
+
+  // forceExpand の処理
+  useEffect(() => {
+    if (forceExpand === true) {
+      setCollapsed(false);
+    } else if (forceExpand === false) {
+      setCollapsed(true);
+    }
+  }, [forceExpand]);
 
   const toggleCollapse = () => setCollapsed(!collapsed);
-
-  
 
   const getSummary = () => {
     if (command.type === 'show_text') {
