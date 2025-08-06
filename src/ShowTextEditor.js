@@ -18,6 +18,7 @@ const ShowTextEditor = ({ command, onChange }) => {
         >
           <option value="ナギサ">ナギサ</option>
           <option value="ヒイロ">ヒイロ</option>
+          <option value="？？？">？？？</option>
         </select>
       </div>
 
@@ -81,6 +82,7 @@ const ShowTextEditor = ({ command, onChange }) => {
         >
           <option value="fukidashi_nagisa">fukidashi_nagisa</option>
           <option value="fukidashi_hiro">fukidashi_hiro</option>
+          <option value="fukidashi_others">fukidashi_others</option>
         </select>
       </div>
     </div>
