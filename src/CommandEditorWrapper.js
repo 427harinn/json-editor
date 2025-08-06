@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import CommandEditor from './CommandEditor';
 
 export default function CommandEditorWrapper({ command, onChange, onDelete, defaultCollapsed = true, forceExpand }) {
-  // 初期状態を defaultCollapsed から設定
+  // 初期状態のみ defaultCollapsed を使用
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
-  // defaultCollapsed が変更されたときに collapsed を更新
+  // defaultCollapsed の変更を監視（条件付き）
   useEffect(() => {
-    setCollapsed(defaultCollapsed);
+    if (!defaultCollapsed) {  // falseの場合（新規追加時）のみ更新
+      setCollapsed(false);
+    }
   }, [defaultCollapsed]);
 
   // forceExpand の処理

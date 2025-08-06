@@ -21,6 +21,13 @@ function App() {
   "choice",
   "next"
 ];
+const emptyData = [
+  {
+    title: "新しいシナリオ",
+    commands: []
+  }
+];
+
 // コマンドテンプレート
 const COMMAND_TEMPLATES = {
   show_text: {
@@ -205,7 +212,9 @@ const COMMAND_TEMPLATES = {
   return (
     <div style={{ padding: "20px" }}>
       <h1>ノベルゲーム JSON エディタ</h1>
-
+      <button onClick={() => setJsonData({ items: emptyData })}>
+        新規作成
+      </button>
       <input type="file" accept=".json" onChange={handleFileUpload} />
       {jsonData && (
         <div style={{ marginTop: "20px", marginBottom: "20px", padding: "10px", border: "1px solid #aaa", backgroundColor: "#f8f8f8" }}>
@@ -313,7 +322,7 @@ const COMMAND_TEMPLATES = {
                       newData.items[itemIndex].commands[originalIndex] = updatedCommand;
                       setJsonData(newData);
                     }}
-                    defaultCollapsed={command.__id !== lastAddedCommandId}
+                    defaultCollapsed={!command.__id || command.__id !== lastAddedCommandId} // ここを修正
                     forceExpand={expandAll}
                   />
 
