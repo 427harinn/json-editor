@@ -4,6 +4,7 @@ import CommandEditor from './CommandEditor';
 
 function App() {
   const [jsonData, setJsonData] = useState(null);
+  const lastAddedRef = useRef(null);
   const COMMAND_TYPE_ORDER = [
   "show_text",
   "show_character",
@@ -21,30 +22,30 @@ function App() {
 const COMMAND_TEMPLATES = {
   show_text: {
     type: "show_text",
-    character: "",
+    character: "ナギサ", // デフォルトキャラ
     text: "",
-    text_speed: 0.05,
-    wait_for_click: true,
-    text_ui: ""
+    text_speed: 0.05, // デフォルトのテキスト速度
+    wait_for_click: true, // クリック待ちしない
+    text_ui:"fukidashi_nagisa"
   },
   show_character: {
     type: "show_character",
-    character: "",
-    position: "",
-    motion: "",
-    is_speaking: false,
-    replace: true
+    character: "nagisa_Live2D",     // デフォルトキャラ
+    position: "center",             // デフォルト位置
+    motion: "nagisa_tu_1",          // デフォルトモーション
+    is_speaking: true,              // 発話中
+    replace: false                  // 置き換えない
   },
   set_background: {
     type: "set_background",
-    background: ""
+    background: "clear"
   },
   play_bgm: {
     type: "play_bgm",
-    bgm: "",
-    fade: "",
-    fade_time: 1.0,
-    bgm_volume: 1.0
+    bgm: "",           // 手動入力
+    fade: "",          // "in", "out", ""（空欄）
+    fade_time: 1.0,    // 数値入力、デフォルト1.0
+    bgm_volume: 1.0    // 数値入力、デフォルト1.0
   },
   play_se: {
     type: "play_se",
@@ -55,9 +56,9 @@ const COMMAND_TEMPLATES = {
   show_effect: {
     type: "show_effect",
     effect: "",
-    effect_position: "",
-    duration: 1.0,
-    loop: false,
+    effect_position: "center",
+    duration: 0,
+    loop: true,
     id: ""
   },
   hide_effect: {
@@ -85,7 +86,7 @@ const COMMAND_TEMPLATES = {
   },
   next: {
     type: "next",
-    mode: "",
+    mode: "scene",
     next_target: ""
   }
 };
@@ -112,9 +113,11 @@ const COMMAND_TEMPLATES = {
     if (!jsonData) return;
 
     // 空のステップ（commandsが空）を除いた新しいデータを作成
-    const filteredItems = jsonData.items.filter(
-      (step) => step.commands && step.commands.length > 0
-    );
+    const filteredItems = jsonData.items
+      .filter((step) => step.commands && step.commands.length > 0)
+      .map((step) => ({
+        commands: step.commands.map(({ __id, ...rest }) => rest) // __id を除外
+      }));
 
     const cleanedData = {
       ...jsonData,
@@ -171,14 +174,26 @@ const COMMAND_TEMPLATES = {
 
   const [lastAddedCommandId, setLastAddedCommandId] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     if (lastAddedCommandId) {
-      const timer = setTimeout(() => {
+      // スクロール
+      const scrollTimer = setTimeout(() => {
+        lastAddedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+
+      // 3秒後にハイライト解除
+      const fadeTimer = setTimeout(() => {
         setLastAddedCommandId(null);
-      }, 5000); // 3秒で解除
-      return () => clearTimeout(timer);
+      }, 3000);
+
+      return () => {
+        clearTimeout(scrollTimer);
+        clearTimeout(fadeTimer);
+      };
     }
   }, [lastAddedCommandId]);
+
+
 
 
 
@@ -196,10 +211,14 @@ const COMMAND_TEMPLATES = {
 
       {jsonData && (
         <div style={{ marginTop: "20px" }}>
+          <button onClick={handleDownload} style={{ marginTop: '20px' }}>
+            編集済みJSONをダウンロード
+          </button>
           <h2>読み込んだJSONデータ：</h2>
 
           {jsonData.items.map((item, itemIndex) => (
             <div key={itemIndex} style={{ marginBottom: "30px", padding: "10px", border: "1px solid #ccc" }}>
+              
               
               {/* ステップ前に挿入するボタン */}
 
@@ -233,17 +252,19 @@ const COMMAND_TEMPLATES = {
               .map(({ command, originalIndex }, sortedIndex) => (
               <div
                 key={sortedIndex}
+                ref={command.__id === lastAddedCommandId ? lastAddedRef : null}
                 style={{
                   position: "relative",
                   border: command.__id === lastAddedCommandId
-                    ? "2px solid #fbc02d" // 目立つ黄色
-                    : "1px dashed #ccc",  // 通常の枠
+                    ? "2px solid #fbc02d"
+                    : "1px dashed #ccc",
                   marginBottom: "10px",
                   padding: "10px",
                   borderRadius: "6px",
                   transition: "border 0.5s ease"
                 }}
               >
+
 
                 
 
@@ -284,12 +305,16 @@ const COMMAND_TEMPLATES = {
                     ...COMMAND_TEMPLATES[selectedType],
                     __id: crypto.randomUUID?.() || Math.random().toString(36).substr(2, 9) // 識別用
                   };
-                  setLastAddedCommandId(newCommand.__id);
 
 
                   const newData = { ...jsonData };
                   newData.items[itemIndex].commands.push(newCommand);
                   setJsonData(newData);
+                  setLastAddedCommandId(newCommand.__id);
+                  setTimeout(() => {
+                    lastAddedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 50);
+
                 }}
               >
                 <option value="">＋ コマンドを選んで追加</option>
@@ -315,11 +340,31 @@ const COMMAND_TEMPLATES = {
           </button>
         </div>
       )}
-      <button onClick={handleDownload} style={{ marginTop: '20px' }}>
-        編集済みJSONをダウンロード
+
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: "50%",
+          width: "50px",
+          height: "50px",
+          fontSize: "20px",
+          cursor: "pointer",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
+        }}
+        title="一番上へ"
+      >
+        ⬆
       </button>
 
     </div>
+
+    
   );
 }
 
