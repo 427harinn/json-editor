@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import CommandEditor from './CommandEditor';
+//import CommandEditor from './CommandEditor';
+import CommandEditorWrapper from './CommandEditorWrapper';
+import './style.css';
+
 
 
 function App() {
@@ -193,13 +196,9 @@ const COMMAND_TEMPLATES = {
     }
   }, [lastAddedCommandId]);
 
+  const [expandAll, setExpandAll] = useState(false); // 初期状態は「すべて折りたたみ」
 
-
-
-
-  
-
-
+  const toggleExpandAll = () => setExpandAll(prev => !prev);
 
 
 
@@ -208,7 +207,6 @@ const COMMAND_TEMPLATES = {
       <h1>ノベルゲーム JSON エディタ</h1>
 
       <input type="file" accept=".json" onChange={handleFileUpload} />
-
       {jsonData && (
         <div style={{ marginTop: "20px", marginBottom: "20px", padding: "10px", border: "1px solid #aaa", backgroundColor: "#f8f8f8" }}>
           <h3>📌 テキスト一覧（クリックでジャンプ）</h3>
@@ -244,39 +242,43 @@ const COMMAND_TEMPLATES = {
 
       {jsonData && (
         <div style={{ marginTop: "20px" }}>
-          <button onClick={handleDownload} style={{ marginTop: '20px' }}>
-            編集済みJSONをダウンロード
-          </button>
-          <h2>読み込んだJSONデータ：</h2>
+        <button className="download-button" onClick={handleDownload}>
+          💾 編集済みJSONをダウンロード
+        </button>
 
+          <h2>読み込んだJSONデータ：</h2>
+          {jsonData && (
+            <div style={{ marginBottom: '20px' }}>
+              <button onClick={toggleExpandAll}>
+                {expandAll ? '▼ すべて折りたたむ' : '▶ すべて展開する'}
+              </button>
+            </div>
+          )}
           {jsonData.items.map((item, itemIndex) => (
               <div
                 key={itemIndex}
                 id={`step-${itemIndex}`} 
                 style={{ marginBottom: "30px", padding: "10px", border: "1px solid #ccc" }}
               >
-              
-              
-              {/* ステップ前に挿入するボタン */}
 
+
+              {/* ステップ前に挿入するボタン */}
               <button
                 onClick={() => insertStepAt(itemIndex)}
-                style={{ marginBottom: "10px", backgroundColor: "#d3f8d3" }}
+                className="add-button"
               >
                 ＋ このステップの前にステップを追加
               </button>
+
               <button
                 onClick={() => deleteStepAt(itemIndex)}
-                style={{
-                  marginTop: "10px",
-                  backgroundColor: "#fdd",
-                  color: "#900",
-                  border: "1px solid #900"
-                }}
+                className="delete-button"
               >
                 − このステップを削除
-            </button>
+              </button>
+
               <h3>ステップ {itemIndex + 1}: {getStepTitle(item)}</h3>
+
 
 
             {item.commands
@@ -304,15 +306,18 @@ const COMMAND_TEMPLATES = {
 
 
                 
-
-                  <CommandEditor
+                  <CommandEditorWrapper
                     command={command}
                     onChange={(updatedCommand) => {
                       const newData = { ...jsonData };
                       newData.items[itemIndex].commands[originalIndex] = updatedCommand;
                       setJsonData(newData);
                     }}
+                    defaultCollapsed={command.__id !== lastAddedCommandId}
+                    forceExpand={expandAll}
                   />
+
+
                   <button
                     onClick={() => deleteCommandAt(itemIndex, originalIndex)}
                     style={{
@@ -371,7 +376,7 @@ const COMMAND_TEMPLATES = {
           ))}
           <button
             onClick={() => insertStepAt(jsonData.items.length)}
-            style={{ marginTop: "20px", backgroundColor: "#d3f8d3" }}
+            className="add-button"
           >
             ＋ 一番最後にステップを追加
           </button>

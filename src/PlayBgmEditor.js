@@ -8,7 +8,7 @@ const PlayBgmEditor = ({ command, onChange }) => {
   };
 
   return (
-        <div style={{ marginBottom: "10px", background: "#f4f4f4", padding: "10px", borderRadius: "6px" }}>
+      <div style={{ marginBottom: "10px", background: "#f4f4f4", padding: "10px", borderRadius: "6px" }}>
       <label><strong>type:</strong> {command.type}</label>
       <div style={{ marginBottom: "5px" }}>
         <label>bgm:</label>
