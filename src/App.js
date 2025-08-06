@@ -210,6 +210,39 @@ const COMMAND_TEMPLATES = {
       <input type="file" accept=".json" onChange={handleFileUpload} />
 
       {jsonData && (
+        <div style={{ marginTop: "20px", marginBottom: "20px", padding: "10px", border: "1px solid #aaa", backgroundColor: "#f8f8f8" }}>
+          <h3>📌 テキスト一覧（クリックでジャンプ）</h3>
+          <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+            {jsonData.items.map((item, index) => {
+              const textCommand = item.commands.find(cmd => cmd.type === "show_text");
+              const label = textCommand && textCommand.text
+                ? (textCommand.text.length > 15
+                    ? textCommand.text.slice(0, 15) + "..."
+                    : textCommand.text)
+                : "（テキストなし）";
+
+              return (
+                <li key={index} style={{ marginBottom: "6px" }}>
+                  <button
+                    onClick={() => {
+                      const target = document.getElementById(`step-${index}`);
+                      if (target) {
+                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    }}
+                    style={{ cursor: "pointer", background: "none", border: "none", color: "#007bff", textDecoration: "underline", padding: 0 }}
+                  >
+                    {index + 1}. 「{label}」
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+
+      {jsonData && (
         <div style={{ marginTop: "20px" }}>
           <button onClick={handleDownload} style={{ marginTop: '20px' }}>
             編集済みJSONをダウンロード
@@ -217,7 +250,11 @@ const COMMAND_TEMPLATES = {
           <h2>読み込んだJSONデータ：</h2>
 
           {jsonData.items.map((item, itemIndex) => (
-            <div key={itemIndex} style={{ marginBottom: "30px", padding: "10px", border: "1px solid #ccc" }}>
+              <div
+                key={itemIndex}
+                id={`step-${itemIndex}`} 
+                style={{ marginBottom: "30px", padding: "10px", border: "1px solid #ccc" }}
+              >
               
               
               {/* ステップ前に挿入するボタン */}
