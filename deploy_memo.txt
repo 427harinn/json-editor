@@ -1,0 +1,48 @@
+【ReactアプリをGitHub Pagesに再デプロイする手順メモ】
+
+■① コードを修正する  
+VSCode で App.js などを更新。
+
+■② ビルドコマンドを実行
+ターミナルで以下を実行：
+
+    npm run build
+
+→ build/ フォルダが生成される
+
+■③ GitHub Pages にデプロイ
+
+※ 初回だけ必要な準備：
+
+1. gh-pages をインストール：
+
+    npm install --save gh-pages
+
+2. package.json を編集：
+
+"homepage" を追加：
+
+    "homepage": "https://427harinn.github.io/json-editor",
+
+scripts に以下を追加：
+
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+
+※ ここまでが初回だけ
+
+---
+
+【以降、変更のたびにやること】
+
+1. コード修正  
+2. npm run build  
+3. npm run deploy  
+
+---
+
+【確認用URL】
+
+https://427harinn.github.io/json-editor/
+
+変更が反映されたか確認する。
